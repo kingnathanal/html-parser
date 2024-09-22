@@ -1,3 +1,8 @@
+<!--
+    author: William Britton
+    COSC 631
+    Assignment 2
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,29 +12,65 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
 <body>
-    <div class="container mt-5 p-3 bg-light shadow">
-        <div class="row">
-            <div class="col text-center">
-                <h1 class="h1">HTML Parser</h1>
+    <div class="container">
+        <div class="row mt-5 p-3 bg-light shadow">
+            <div class="col">
+                <div class="row">
+                    <div class="col text-center">
+                        <h1 class="h1">HTML Parser</h1>
+                    </div>
+                </div>
+                <div class="row mt-5 mb-2 justify-content-center">
+                    <div class="col-6 text-center">
+                        <div class="mt-5 mb-3">
+                            <label for="exampleFormControlInput1" class="form-label text-left"><h3 class="h3">~ Enter Site to Parse ~</h3></label>
+                            <input type="text" class="form-control form-control-lg text-center" id="urlinput" placeholder="http://www.google.com">
+                            <button type="button" id="submiturl" class="btn btn-primary px-5 my-2">Enter</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="row mt-5 mb-2 justify-content-center">
-            <div class="col-6 text-center">
-                <div class="mt-5 mb-3">
-                    <label for="exampleFormControlInput1" class="form-label text-left"><h3 class="h3">~ Enter Site to Parse ~</h3></label>
-                    <input type="text" class="form-control form-control-lg text-center" id="exampleFormControlInput1" placeholder="www.google.com">
-                    <button type="button" id="submiturl" class="btn btn-primary px-5 my-2">Enter</button>
+        <div class="row mt-3">
+            <div class="col col-auto w-100 text-center">
+                <div class="messages alert alert-warning d-none w-100 mt-4" role="alert"></div>
+            </div>
+        </div>
+        <div class="row text-center justify-content-center">
+            <div class="col col-6">
+                <div class="total-tags bg-primary bg-gradient pt-4">
+                    <h2 class="h3">Total Tags: URL</h2>
+                    <div class="total-tags-body h3">
+                        yeap
+                    </div>
+                </div>
+            </div>
+            <div class="col col-6">
+                <div class="tag-info bg-success bg-gradient pt-4">
+                    <h2 class="h3">Tag Info: URL</h2>
+                    <div class="tag-info-body">
+                        yeap
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     <script>
-        let fetchHello = fetch("/api/sayhello"); 
+        // reset elements
+        let messages = document.querySelector(".messages");
+        let tt = document.querySelector(".total-tags");
+        let ti = document.querySelector(".tag-info");
 
         document.querySelector("#submiturl").addEventListener("click", () => {
-            let site = document.querySelector("#exampleFormControlInput1").value;
-            console.log(`Site: ${site}`);
-            getHtml(site.trim());
+            messages.classList.add("d-none");
+            messages.classList.remove("alert-danger");
+            messages.classList.remove("alert-warning");
+            messages.innerHTML="";
+
+            let input = document.querySelector("#urlinput");
+            let site = input.value.trim();
+            input.value = "";
+            getHtml(site);
         })
 
         const getHtml = (url) => {
@@ -46,12 +87,18 @@
                     body: JSON.stringify({"url":url})
                 };
 
-                const html = fetch('/parse',options)
+                const html = fetch('/url/parse',options)
                                 .catch((err) => {
-                                    console.log(`Request Failed: ${err}`)
+                                    console.log(`Request Failed: ${err}`);
+                                    messages.innerHTML = "OOPS Something Went Wrong!!!!!";
+                                    messages.classList.add("alert-danger");
+                                    messages.classList.remove("d-none");
                                 });
             } else {
                 console.log("URL is empty");
+                messages.innerHTML = "Invalid format for URL!!!";
+                messages.classList.add("alert-warning");
+                messages.classList.remove("d-none");
             }
         }
     </script>
