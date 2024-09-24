@@ -38,34 +38,48 @@
         </div>
         <div class="row text-center justify-content-center">
             <div class="col col-6">
-                <div class="total-tags bg-primary bg-gradient pt-4">
-                    <h2 class="h3">Total Tags: URL</h2>
-                    <div class="total-tags-body h3">
-                        yeap
+                <div class="total-tags d-none pt-4">
+                    <div class="card">
+                        <div class="card-header h3 text-white bg-success">
+                            Total Tags - <span class="url-name"></span>
+                        </div>
+                        <div class="card-body total-tags-body h1 text-success fw-bolder">
+                            
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="col col-6">
-                <div class="tag-info bg-success bg-gradient pt-4">
-                    <h2 class="h3">Tag Info: URL</h2>
-                    <div class="tag-info-body">
-                        yeap
+                <div class="tag-info d-none pt-4">
+                    <div class="card">
+                        <div class="card-header h3 text-white bg-success">
+                            Tag Info - <span class="url-name"></span>
+                        </div>
+                        <div class="card-body tag-info-body text-success">
+                            
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <script>
-        // reset elements
+        
         let messages = document.querySelector(".messages");
         let tt = document.querySelector(".total-tags");
         let ti = document.querySelector(".tag-info");
 
         document.querySelector("#submiturl").addEventListener("click", () => {
+            // reset elements
             messages.classList.add("d-none");
             messages.classList.remove("alert-danger");
             messages.classList.remove("alert-warning");
             messages.innerHTML="";
+
+            tt.classList.add("d-none");
+            ti.classList.add("d-none");
+            document.querySelector(".total-tags-body").innerHTML = "";
+            document.querySelector(".tag-info-body").innerHTML = "";
 
             let input = document.querySelector("#urlinput");
             let site = input.value.trim();
@@ -75,7 +89,7 @@
 
         const getHtml = (url) => {
             if(url != "") {
-                
+                document.querySelectorAll(".url-name").forEach(x => x.innerHTML = url);
                 var data = new FormData();
                 data.append("parseurl", JSON.stringify({"url":url}));
 
@@ -86,14 +100,44 @@
                     },
                     body: JSON.stringify({"url":url})
                 };
-
-                const html = fetch('/url/parse',options)
-                                .catch((err) => {
-                                    console.log(`Request Failed: ${err}`);
+                try {
+                    const html = fetch('/url/parse',options)
+                                .then((res) => {
+                                    if(res.status === 200) {
+                                        const tagtotal = fetch('/url/tagtotal', options)
+                                                            .then(res => res.json())
+                                                            .then(data => {
+                                                                //console.log(data);
+                                                                document.querySelector(".total-tags-body").innerHTML = data.tag_total;
+                                                            });
+                                        const taginfo = fetch('/url/taginfo', options)
+                                                            .then(res => res.json())
+                                                            .then(data => {
+                                                                //console.log(data);
+                                                                data.forEach(tag => {
+                                                                    var tagdiv = document.createElement("div");
+                                                                    tagdiv.classList.add("d-block");
+                                                                    tagdiv.innerHTML = `${tag.tag} - ${tag.tag_count}`;
+                                                                    document.querySelector(".tag-info-body").append(tagdiv);
+                                                                });
+                                                            });
+                                        tt.classList.remove("d-none");
+                                        ti.classList.remove("d-none");
+                                    } else {
+                                        throw new Error('Something went wrong');
+                                    }
+                                })
+                                .catch((error) => {
+                                    console.log(`Request Failed: ${error}`);
                                     messages.innerHTML = "OOPS Something Went Wrong!!!!!";
                                     messages.classList.add("alert-danger");
                                     messages.classList.remove("d-none");
                                 });
+                } catch(error) {
+                    messages.innerHTML = "OOPS Something Went Wrong!!!!!";
+                    messages.classList.add("alert-danger");
+                    messages.classList.remove("d-none");
+                }
             } else {
                 console.log("URL is empty");
                 messages.innerHTML = "Invalid format for URL!!!";

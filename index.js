@@ -22,14 +22,26 @@ app.get('/assignment2', function (req, res) {
  })
 
 // route that will begin parsing tag process by URL
-app.post('/url/parse', jsonParser, function(req, res) {
-    helper.parseUrlTags(req.body.url);
-    res.sendStatus(200);
+app.post('/url/parse', jsonParser, async function(req, res) {
+    let status = await helper.parseUrlTags(req.body.url);
+    if(status === undefined) {
+        res.status(500).send("Error: Something went wrong!!");
+    } else {
+        res.sendStatus(200);
+    }
 })
 
 // route that will begin collecting tag info by URL from database
-app.post('/url/taginfo', jsonParser, function(req, res) {
-    res.sendStatus(200);
+app.post('/url/taginfo', jsonParser, async function(req, res) {
+    console.log("Fetching URL tag info...");
+    let results = await dbconn.getTagInfoRecordsByUrl(req.body.url);
+    res.status(200).send(results);
+})
+
+app.post('/url/tagtotal', jsonParser, async function(req, res) {
+    console.log("Fetching URL tag total...");
+    let results = await dbconn.getTagTotalByUrl(req.body.url);
+    res.status(200).send(results[0]);
 })
 
 const httpsServer = https.createServer({

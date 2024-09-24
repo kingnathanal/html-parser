@@ -1,64 +1,66 @@
-const mysql = require('mysql2');
+//const mysql = require('mysql2/promise');
 const dotenv = require('dotenv').config();
 
-const addHtmlTagRecord = (url, tag, tag_count) => {
+const addHtmlTagRecord = async (url, tag, tag_count) => {
     let query = "INSERT INTO `html_tags` (`url`,`tag`,`tag_count`) VALUES (?,?,?)";
     let values = [url,tag,tag_count];
-    executeDBQuery(query, values);
+    await executeDBQuery(query, values);
 }
 
-const addUrlTagTotalRecord = (url, total) => {
+const addUrlTagTotalRecord = async (url, total) => {
     let query = "INSERT INTO `url_tag_total` (`url`,`tag_total`) VALUES (?,?)";
     let values = [url, total];
-    executeDBQuery(query, values);
+    await executeDBQuery(query, values);
 }
 
-const deleteUrlTagRecords = (url) => {
+const deleteUrlTagRecords = async (url) => {
     let query = "DELETE FROM `html_tags` WHERE `url`=?";
     let values = [url];
-    executeDBQuery(query, values);
+    await executeDBQuery(query, values);
 }
 
-const deleteUrlTagTotalRecords = (url) => {
+const deleteUrlTagTotalRecords = async (url) => {
     let query = "DELETE FROM `url_tag_total` WHERE `url`=?";
     let values = [url];
-    executeDBQuery(query, values);
+    await executeDBQuery(query, values);
 }
 
-const getRecordsBySite = (url) => {
+const getTagInfoRecordsByUrl = async (url) => {
     let query = "SELECT * FROM `html_tags` WHERE `url`=?";
     let values = [url];
-    executeDBQuery(query, values);
+    return await executeDBQuery(query, values);
 }
 
-const executeDBQuery = (query,values) => {
-    try {
-        var {result, fields} = db.execute(query,values);
-        //console.log(result);
-        //console.log(fields);
-    } catch (err) {
-        console.log(err);
-    }
+const getTagTotalByUrl = async (url) => {
+    let query = "SELECT `tag_total` FROM `url_tag_total` WHERE `url`=?";
+    let values = [url];
+    return await executeDBQuery(query, values);
 }
 
-const db = mysql.createConnection({
+const mysql = require("mysql2/promise");
+const pool = mysql.createPool({
     host: process.env.db_host,
     user: process.env.db_user,
     password: process.env.db_pass,
-    database: process.env.db_name
-});
+    database: process.env.db_name   
+})
 
-db.connect((err) => {
-    if (err) {
-        console.error('Error connecting to MySQL: ' + err.stack);
-        return;
-    }
-    console.log('Connected to MySQL as ID ' + db.threadId);
-});
+const executeDBQuery = async (query,values) => {
 
-module.exports = { addHtmlTagRecord, 
+    const connection = await pool.getConnection();
+    
+    const [rows, fields] = await connection.execute(query,values);
+
+    connection.release();
+
+    return rows;
+}
+
+module.exports = { 
+                   addHtmlTagRecord, 
                    addUrlTagTotalRecord, 
                    deleteUrlTagRecords, 
                    deleteUrlTagTotalRecords,
-                   getRecordsBySite
+                   getTagInfoRecordsByUrl,
+                   getTagTotalByUrl
                 };
