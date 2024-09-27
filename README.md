@@ -13,6 +13,6 @@ Run the nodejs app with nodemon to help restart the app
 ```
 npm run dev
 ```
-
+[View Live WebSite](https://thelowerorbit.com:5000/assignment2)
 
 ![alt text](image.png)
