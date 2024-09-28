@@ -6,7 +6,7 @@ const cors = require('cors');
 const fs = require('fs');
 const dotenv = require('dotenv').config();
 const bodyParser = require('body-parser');
-var dbconn = require(path.join(__dirname,"./database"));
+const dbconn = require(path.join(__dirname,"./database"));
 const helper = require(path.join(__dirname,"./helpers"));
 
 // enable cors on the nodejs server
