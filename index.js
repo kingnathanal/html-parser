@@ -17,7 +17,7 @@ app.use(cors({
 var jsonParser = bodyParser.json();
 
 // route to access webpage for Assignment 2
-app.get('/assignment2', function (req, res) {
+app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname,"public/index.html"));
  })
 

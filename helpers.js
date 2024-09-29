@@ -3,8 +3,7 @@ const { default: axios } = require('axios');
 const { parse } = require('node-html-parser');
 const { error } = require('console');
 const { rejects } = require('assert');
-const { errorMonitor } = require('events');
-var dbconn = require(path.join(__dirname,"./database"));
+const dbconn = require(path.join(__dirname,"./database"));
 
 // Begin fetch and html parse of give URL
 const parseUrlTags = async (parseUrl) => {
@@ -29,7 +28,6 @@ const fetchHTMLData = async (url) => {
                             console.log(error.message);
                         });
     return x.data;
-
 }
 
 // Function that will HTML parse the given HTML data.
