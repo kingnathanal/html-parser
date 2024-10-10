@@ -34,6 +34,11 @@
         <div class="row mt-3">
             <div class="col col-auto w-100 text-center">
                 <div class="messages alert alert-warning d-none w-100 mt-4" role="alert"></div>
+                <div class="wait-spinner d-none">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="row text-center justify-content-center">
@@ -68,6 +73,7 @@
         let messages = document.querySelector(".messages");
         let tt = document.querySelector(".total-tags");
         let ti = document.querySelector(".tag-info");
+        let ws = document.querySelector(".wait-spinner");
 
         document.querySelector("#submiturl").addEventListener("click", () => {
             // reset elements
@@ -101,6 +107,7 @@
                     body: JSON.stringify({"url":url})
                 };
                 try {
+                    ws.classList.remove("d-none");
                     const html = fetch('/url/parse',options)
                                 .then((res) => {
                                     if(res.status === 200) {
@@ -121,26 +128,31 @@
                                                                     document.querySelector(".tag-info-body").append(tagdiv);
                                                                 });
                                                             });
+                                        ws.classList.add("d-none");
                                         tt.classList.remove("d-none");
                                         ti.classList.remove("d-none");
                                     } else {
+                                        ws.classList.add("d-none");
                                         throw new Error('Something went wrong');
                                     }
                                 })
                                 .catch((error) => {
                                     console.log(`Request Failed: ${error}`);
+                                    ws.classList.add("d-none");
                                     messages.innerHTML = "OOPS Something Went Wrong!!!!!";
                                     messages.classList.add("alert-danger");
                                     messages.classList.remove("d-none");
                                 });
                 } catch(error) {
                     messages.innerHTML = "OOPS Something Went Wrong!!!!!";
+                    ws.classList.add("d-none");
                     messages.classList.add("alert-danger");
                     messages.classList.remove("d-none");
                 }
             } else {
                 console.log("URL is empty");
                 messages.innerHTML = "Invalid format for URL!!!";
+                ws.classList.add("d-none");
                 messages.classList.add("alert-warning");
                 messages.classList.remove("d-none");
             }
