@@ -6,6 +6,18 @@ const addHtmlTagRecord = async (url, tag, tag_count) => {
     await executeDBQuery(query, values);
 }
 
+const addHtmlTagRecordBulk = async (url, elements, parsedHTML) => {
+    const connection = await pool.getConnection();
+    elements.forEach(async (e) => {
+        let tag = e;
+        let size = parsedHTML.getElementsByTagName(e).length;
+        let query = "INSERT INTO `html_tags` (`url`,`tag`,`tag_count`) VALUES (?,?,?)";
+        let values = [url,tag,size];
+        await connection.execute(query,values);
+    });
+    connection.release();
+}
+
 const addUrlTagTotalRecord = async (url, total) => {
     let query = "INSERT INTO `url_tag_total` (`url`,`tag_total`) VALUES (?,?)";
     let values = [url, total];
@@ -56,7 +68,8 @@ const executeDBQuery = async (query,values) => {
 }
 
 module.exports = { 
-                   addHtmlTagRecord, 
+                   addHtmlTagRecord,
+                   addHtmlTagRecordBulk,
                    addUrlTagTotalRecord, 
                    deleteUrlTagRecords, 
                    deleteUrlTagTotalRecords,

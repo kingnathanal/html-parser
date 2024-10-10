@@ -24,7 +24,7 @@ const parseUrlTags = async (parseUrl) => {
 const fetchHTMLDataPuppet = async (url) => {
 
   const browser = await puppeteer.launch({
-    headless: true,
+    headless: 'shell',
     executablePath: '/usr/bin/chromium-browser',
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
@@ -50,11 +50,8 @@ const parseHTMLData = async (url,data) => {
 
     var elements = parsedHTML.getElementsByTagName('*').map((x) => x.tagName);
     elements.forEach((x) => { elementset.add(x); });
-    elementset.forEach(async (x) => {
-        let tag = x;
-        let size = parsedHTML.getElementsByTagName(x).length;
-        await dbconn.addHtmlTagRecord(url,tag,size);
-    });
+
+    dbconn.addHtmlTagRecordBulk(url,elementset,parsedHTML);
 }
 
 // Function that will clean up any records that may exist by URL
