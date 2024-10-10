@@ -11,7 +11,8 @@ const helper = require(path.join(__dirname,"./helpers"));
 
 // enable cors on the nodejs server
 app.use(cors({
-    origin: "*"
+    credentials: true,
+    origin: "thelowerorbit.com:5000"
 }))
 
 var jsonParser = bodyParser.json();
@@ -23,12 +24,14 @@ app.get('/', function (req, res) {
 
 // route that will begin parsing tag process by URL
 app.post('/url/parse', jsonParser, async function(req, res) {
-    let status = await helper.parseUrlTags(req.body.url);
-    if(status === undefined) {
-        res.status(500).send("Error: Something went wrong!!");
-    } else {
-        res.sendStatus(200);
-    }
+    
+    let status = await helper.parseUrlTags(req.body.url)
+                            .then((response) => {
+                                res.sendStatus(200);
+                            })
+                            .catch((error, response) => {
+                                res.status(406).send(error.message);
+                            });
 })
 
 // route that will begin collecting tag info by URL from database

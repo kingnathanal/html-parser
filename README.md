@@ -6,6 +6,10 @@ The application is hosted on a EC2 server with MySqL database used to cache the 
 
 You will need to add .env file with populated environment variables
 
+Note: 
+
+> for parsing `www.emich.edu` I was getting forbidden with message `Enable JavaScript and cookies to continue` to get around this I swapped out Axios fetch for puppeteer. Puppeteer will require a browser be installed on the VM. Use `sudo apt install chromium-browser chromium-codecs-ffmpeg`
+
 ```
 npm install
 ```

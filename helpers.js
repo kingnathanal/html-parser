@@ -1,33 +1,42 @@
 const path = require('path');
-const { default: axios } = require('axios');
+//const { default: axios } = require('axios');
 const { parse } = require('node-html-parser');
 const { error } = require('console');
 const { rejects } = require('assert');
 const dbconn = require(path.join(__dirname,"./database"));
+const puppeteer = require('puppeteer');
 
 // Begin fetch and html parse of give URL
 const parseUrlTags = async (parseUrl) => {
     console.log(`Fetching the URL: ${parseUrl}...`);
     let url = parseUrl;
-    let htmldata = await fetchHTMLData(url)
+    let htmldata = await fetchHTMLDataPuppet(url)
                 .then(async (x) => {
                     await cleanUpUrlRecords(url);
                     await parseHTMLData(url,x);
-                    return 0;
                 })
                 .catch((error) => {
-                    console.log(error.message);
+                    console.log("Error in parseUrlTags:",error.message);
+                    throw error;
                 });
-    return htmldata;
 }
 
-// Function that will fetch html data for given url
-const fetchHTMLData = async (url) => {
-    const x = await axios.get(url)
-                        .catch((error) => {
-                            console.log(error.message);
-                        });
-    return x.data;
+const fetchHTMLDataPuppet = async (url) => {
+
+  const browser = await puppeteer.launch({
+    headless: true,
+    executablePath: '/usr/bin/chromium-browser',
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  });
+  const page = await browser.newPage();
+
+  await page.goto(url);
+
+  const content = await page.content(); // Get the page content as HTML
+
+  await browser.close();
+
+  return content;
 }
 
 // Function that will HTML parse the given HTML data.
